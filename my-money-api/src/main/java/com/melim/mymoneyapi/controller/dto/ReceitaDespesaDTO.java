@@ -1,0 +1,16 @@
+package com.melim.mymoneyapi.controller.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
+public class ReceitaDespesaDTO {
+	private LancamentoDTO idLancamento;
+	private String categoria;
+}
+
