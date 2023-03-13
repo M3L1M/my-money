@@ -18,6 +18,7 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import com.melim.mymoneyapi.model.enums.Status;
 import com.melim.mymoneyapi.model.enums.TipoLancamento;
+import com.melim.mymoneyapi.model.enums.TipoPagamento;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,7 +54,7 @@ public class Lancamento {
 	@Column(name = "mes")
 	private Integer mes;
 	
-	@Column(name="valor")
+	@Column(name="valor" )
 	private BigDecimal valor;
 	
 	@Column(name="tipo_lancamento")
@@ -61,6 +62,11 @@ public class Lancamento {
 	private TipoLancamento tipoLancamento;
 	
 	@Column(name="status")
+	@Enumerated(EnumType.STRING)
 	private Status status;
+	
+	@Column(name="tipo_pagamento")
+	@Enumerated(EnumType.STRING)
+	private TipoPagamento tipoPagamento;
 	
 }

@@ -2,6 +2,7 @@ package com.melim.mymoneyapi.controller.rest;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +24,7 @@ import com.melim.mymoneyapi.model.enums.CategoriaDespesa;
 import com.melim.mymoneyapi.model.enums.CategoriaReceita;
 import com.melim.mymoneyapi.model.enums.Status;
 import com.melim.mymoneyapi.model.enums.TipoLancamento;
+import com.melim.mymoneyapi.model.enums.TipoPagamento;
 import com.melim.mymoneyapi.service.DespesaService;
 import com.melim.mymoneyapi.service.LancamentoService;
 import com.melim.mymoneyapi.service.ReceitaService;
@@ -36,6 +39,15 @@ public class LancamentoController {
 	private final ReceitaService receitaService;
 	private final DespesaService despesaService;
 	
+	@GetMapping
+	public List<Lancamento> lista(@RequestParam("descricao") String descricao ){
+		Lancamento lancamento=new Lancamento();
+		lancamento.setStatus(Status.ATIVO);	
+		lancamento.setDescricao(descricao);
+		
+		return service.buscar(lancamento);
+	}
+	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Integer save(@RequestBody ReceitaDespesaDTO dto) {
@@ -44,7 +56,7 @@ public class LancamentoController {
 		lancamento.setDataCadastro(LocalDate.now());
 		lancamento.setHoraCadastro(LocalTime.now());
 		lancamento.setStatus(Status.ATIVO);
-		lancamento=service.save(lancamento);
+		lancamento=service.save(lancamento); 
 		
 		if(lancamento.getTipoLancamento().equals(TipoLancamento.RECEITA)) {
 			Receita receita=new Receita();
@@ -97,6 +109,7 @@ public class LancamentoController {
 		return lancamento.getId();
 	}
 	
+	
 	private LancamentoEspecificoDTO converter(Lancamento lancamento) {
 		LancamentoEspecificoDTO dto=new LancamentoEspecificoDTO();
 		dto.setDescricao(lancamento.getDescricao());
@@ -108,11 +121,14 @@ public class LancamentoController {
 	}
 
 	private Lancamento converter(ReceitaDespesaDTO dto) {
+		
+		
 		Lancamento lancamento=new Lancamento();
 		lancamento.setDescricao(dto.getIdLancamento().getDescricao());
 		lancamento.setAno(dto.getIdLancamento().getAno());
 		lancamento.setMes(dto.getIdLancamento().getMes());
 		lancamento.setValor(dto.getIdLancamento().getValor());
+		lancamento.setTipoPagamento(TipoPagamento.valueOf(dto.getIdLancamento().getTipoPagamento()));;
 		lancamento.setTipoLancamento(TipoLancamento.valueOf(dto.getIdLancamento().getTipoLancamento()));
 		return lancamento;
 	}

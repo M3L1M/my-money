@@ -19,7 +19,10 @@ public class DespesaServiceImpl implements DespesaService {
 	
 	private final DespesaRepository repository;
 	
+	
+	
 	@Override
+	@Transactional
 	public Integer save(Despesa despesa) {
 		despesa=repository.save(despesa);
 		return despesa.getId();

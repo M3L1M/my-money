@@ -1,11 +1,14 @@
 package com.melim.mymoneyapi.service.impl;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-import javax.transaction.Transactional;
-
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.melim.mymoneyapi.model.entity.Lancamento;
@@ -21,6 +24,20 @@ public class LancamentoServiceImpl implements LancamentoService {
 
 	private final LancamentoRepository repository;
 
+	@Override
+	@Transactional(readOnly = true)
+	public List<Lancamento> buscar(Lancamento licencaFiltro) {
+		
+		Example<Lancamento> example=
+				Example.of(licencaFiltro,
+					ExampleMatcher
+						.matching()
+						.withIgnoreCase()
+						.withStringMatcher(StringMatcher.CONTAINING));
+		
+		return repository.findAll(example);
+	}
+	
 	@Override
 	@Transactional
 	public Lancamento save(Lancamento lancamento) {
@@ -82,5 +99,7 @@ public class LancamentoServiceImpl implements LancamentoService {
 		
 		return BigDecimal.ZERO;
 	}
+
+	
 
 }

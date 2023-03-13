@@ -5,25 +5,30 @@ class LancamentoService extends AuthService {
         super('/lancamento')
     }
 
+    async buscar(status){
+        const {data} = await this.get(`${status}`)
+        return data;
+    }
+
     validar(lancamento) {
-        console.log(lancamento)
+        const erros=[]
         if (lancamento.idLancamento.descricao === '') {
-            mensagemAlerta("Descrição em branco")
+            erros.push("Descrição em branco")
         }
         if (lancamento.idLancamento.mes === '' || lancamento.idLancamento.mes === 'Selecione...') {
-            mensagemAlerta("Mês em branco")
+            erros.push("Mês em branco")
         }
         if (lancamento.idLancamento.ano === '') {
-            mensagemAlerta("Ano em branco")
+            erros.push("Ano em branco")
         }
         if (lancamento.idLancamento.ano.length != 4) {
-            mensagemAlerta("Ano invalido")
+            erros.push("Ano invalido")
         }
         if (lancamento.idLancamento.tipoLancamento === '' || lancamento.idLancamento.tipoLancamento === 'Selecione...') {
-            mensagemAlerta("Tipo de lancamento em branco")
+            erros.push("Tipo de lancamento em branco")
         }
         if (lancamento.categoria === '' || lancamento.categoria === 'Selecione...') {
-            mensagemAlerta("Categoria em branco")
+            erros.push("Categoria em branco")
         }
 
         if (lancamento.idLancamento.mes === 'Janeiro') {
@@ -52,29 +57,7 @@ class LancamentoService extends AuthService {
             lancamento.idLancamento.mes = 12;
         }
 
-        if (lancamento.idLancamento.tipoLancamento === 'Receita') {
-            lancamento.idLancamento.tipoLancamento = 'RECEITA'
-        } else if (lancamento.idLancamento.tipoLancamento === 'Despesa') {
-            lancamento.idLancamento.tipoLancamento = 'DESPESA'
-        }
-
-        if (lancamento.categoria === 'Ganhos de Investimentos') {
-            lancamento.categoria = 'GANHO_INVESTIMENTO'
-        } else if (lancamento.categoria === 'Salario') {
-            lancamento.categoria = 'SALARIO'
-        } else if (lancamento.categoria === 'Extra') {
-            lancamento.categoria = 'EXTRA'
-        }
-
-        else if (lancamento.categoria === 'Conta') {
-            lancamento.categoria = 'CONTA'
-        } else if (lancamento.categoria === 'Entretenimento') {
-            lancamento.categoria = 'ENTRETENIMENTO'
-        } else if (lancamento.categoria === 'Investimento') {
-            lancamento.categoria = 'INVESTIMENTO'
-        } else if (lancamento.categoria === 'Curso') {
-            lancamento.categoria = 'CURSO'
-        }
+       return erros;
 
     }
 
@@ -99,27 +82,36 @@ class LancamentoService extends AuthService {
     async tipoLancamento() {
         return [
             { name: 'Selecione...', value: '' },
-            { name: 'Despesa', value: 'DESPESA' },
-            { name: 'Receita', value: 'RECEITA' },
+            { name: 'DESPESA', value: 'DESPESA' },
+            { name: 'RECEITA', value: 'RECEITA' },
+        ]
+    }
+
+    async tipoPagamento() {
+        return [
+            { name: 'Selecione...', value: '' },
+            { name: 'DINHEIRO', value: 'DINHEIRO' },
+            { name: 'PIX', value: 'PIX' },
+            { name: 'CREDITO', value: 'CREDITO' },
         ]
     }
 
     async categoriaReceita() {
         return [
             { name: 'Selecione...', value: '' },
-            { name: 'Ganhos de Investimentos', value: 'GANHO_INVESTIMENTO' },
-            { name: 'Salario', value: 'SALARIO' },
-            { name: 'Extra', value: 'EXTRA' },
+            { name: 'GANHO_INVESTIMENTO', value: 'GANHO_INVESTIMENTO' },
+            { name: 'SALARIO', value: 'SALARIO' },
+            { name: 'EXTRA', value: 'EXTRA' },
         ]
     }
 
     async categoriaDespesa() {
         return [
             { name: 'Selecione...', value: '' },
-            { name: 'Conta', value: 'CONTA' },
-            { name: 'Entretenimento', value: 'ENTRETENIMENTO' },
-            { name: 'Investimento', value: 'INVESTIMENTO' },
-            { name: 'Curso', value: 'CURSO' }
+            { name: 'CONTA', value: 'CONTA' },
+            { name: 'ENTRETENIMENTO', value: 'ENTRETENIMENTO' },
+            { name: 'INVESTIMENTO', value: 'INVESTIMENTO' },
+            { name: 'CURSO', value: 'CURSO' }
         ]
     }
 

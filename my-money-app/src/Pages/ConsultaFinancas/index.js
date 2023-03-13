@@ -6,7 +6,8 @@ import { Button } from 'primereact/button'
 import FormGroup from "../../Components/FormGroup";
 import SelectMenu from "../../Components/SelectMenu";
 import LancamentoService from "../../Service/LancamentoService";
-import { mensagemErro, mensagemSucesso } from "../../Components/Toastr";
+import * as messages from "../../Components/Toastr";
+
 
 const lancamentoService = new LancamentoService();
 
@@ -21,17 +22,27 @@ const Home = () => {
     const [ano, setAno] = useState('');
     const [mes, setMes] = useState('');
     const [valor, setValor] = useState(0.0);
+    const [tipoPagamento, setTipoPagamento] = useState('');
     const [tipoLancamento, setTipoLancamento] = useState('');
     const [categoria, setCategoria] = useState('');
     const [position, setPosition] = useState('center');
     const [meses] = useState([])
     const [tiposLancamento] = useState([])
+    const [tiposPagamento] = useState([])
     const [categoriaReceita] = useState([])
     const [categoriaDespesa] = useState([])
 
     const dialogFuncMap = {
         'showConfirmDelete': setShowConfirmDelete,
         'showDialogSave': setShowDialogSave
+    }
+
+    const listarLancamentos = () => {
+        var uri = '?categoria';
+        if(tipoLancamento != ''){
+            uri+=`=${tipoLancamento}`
+        }
+
     }
 
     const gerarSelectMeses = () => {
@@ -83,11 +94,23 @@ const Home = () => {
             })
     }
 
+    const gerarSelectPagamento = () => {
+        lancamentoService
+            .tipoPagamento()
+            .then((query) => {
+                query.forEach((prg) => {
+                    tiposPagamento.push(prg)
+                });
+                return tiposPagamento;
+            })
+    }
+
     useEffect(() => {
         gerarSelectMeses();
         gerarSelectTipoLicenca();
         gerarSelectReceita();
         gerarSelectDespesa();
+        gerarSelectPagamento();
     }, [])
 
 
@@ -104,7 +127,8 @@ const Home = () => {
         setDescricao('');
         setAno('');
         setMes('');
-        setValor(0.0);
+        setValor('');
+        setTipoPagamento('');
         setTipoLancamento('');
         setCategoria('');
 
@@ -115,22 +139,28 @@ const Home = () => {
         const lancamento = {
             idLancamento: {
                 descricao, ano, mes, valor,
-                tipoLancamento,
+                tipoLancamento,tipoPagamento
             },
-             categoria
+            categoria
         }
 
 
-        lancamentoService.validar(lancamento)
+        const erro=lancamentoService.validar(lancamento)
+
+        if(erro.length>0){
+            const mensagens=erro;
+            mensagens.forEach(msg => messages.mensagemAlerta(msg))
+            return false;
+        }
 
         lancamentoService
             .adicionar(lancamento)
             .then(response => {
                 onHide("showDialogSave")
-                mensagemSucesso("Adicionado com sucesso")
+                messages.mensagemSucesso("Adicionado com sucesso")
 
             }).catch(error => {
-                mensagemErro(error.response.data.message);
+                messages.mensagemErro(error.response.data.message);
             })
     }
 
@@ -157,7 +187,13 @@ const Home = () => {
                     <div className="row">
                         <div className='col-md-12'>
                             <div className="bs-component">
-                                <button title="Adicionar" onClick={() => onClick('showDialogSave')} className="btn btn-success" nome="Adicionar">Adicionar</button>
+                                
+                                <button className="btn btn-primary">Buscar</button>
+                                <br/><br/>
+                                <button className="btn btn-secondary">Receita</button>
+                                <button className="btn btn-secondary">Despesa</button>
+                                <button title="Adicionar" style={{ float: "right" }} onClick={() => onClick('showDialogSave')} className="btn btn-success" nome="Adicionar">Adicionar</button>
+
                             </div>
                         </div>
                     </div>
@@ -204,7 +240,17 @@ const Home = () => {
                                         } />
                                     </div>
                                     <div className="col-md-3">
-                                        <FormGroup htmlFor="inputTipoLancamento" label="Tipo de lançamento" children={
+                                        <FormGroup htmlFor="inputPagamento" label="Pagamento" children={
+                                            <SelectMenu id="inputPagamento" name="pagamento"
+                                                value={tipoPagamento} className="form-control"
+                                                onChange={(e) => [setTipoPagamento(e.target.value)]}
+                                                lista={tiposPagamento} />
+                                        } />
+                                    </div>
+                                </div>
+                                <div className="row">
+                                    <div className="col-md-4">
+                                        <FormGroup htmlFor="inputTipoLancamento" label="Tipo de Lançamento" children={
                                             <div>
                                                 {
                                                     atualizando ? (
@@ -218,8 +264,6 @@ const Home = () => {
                                             </div>
                                         } />
                                     </div>
-                                </div>
-                                <div className="row">
                                     <div className="col-md-3">
                                         <FormGroup htmlFor="inputCategoria" label="Categoria" children={
                                             <div>
@@ -232,7 +276,7 @@ const Home = () => {
                                                     ) : (
                                                         <div>
                                                             {
-                                                                tipoLancamento === "Receita" ? (
+                                                                tipoLancamento === "RECEITA" ? (
                                                                     <div>
                                                                         <SelectMenu id="inputCategoria" className="form-control"
                                                                             name="categoria" value={categoria}

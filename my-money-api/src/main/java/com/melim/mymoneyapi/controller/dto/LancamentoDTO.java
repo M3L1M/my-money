@@ -18,4 +18,5 @@ public class LancamentoDTO {
 	private Integer mes;
 	private BigDecimal valor;
 	private String tipoLancamento;
+	private String tipoPagamento;
 }
